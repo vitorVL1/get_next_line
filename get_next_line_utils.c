@@ -6,27 +6,24 @@
 /*   By: vlima <vlima@student.42lisboa.com>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/29 14:29:13 by vlima             #+#    #+#             */
-/*   Updated: 2022/12/05 14:45:05 by vlima            ###   ########.fr       */
+/*   Updated: 2022/12/07 14:45:19 by vlima            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
-int	ft_strlen(char *s)
+size_t	ft_strlen(char *s)
 {
-	int	i;
+	size_t	i;
 
+	if (!s)
+		return (0);
 	i = 0;
-
-	while (s[i] != '\n' || s[i] != '\0')
+	while (s[i] != '\n' && s[i])
 	{
 		i++;
 	}
-	if (s[i] == '\n')
-	{
-		i++;
-	}
-	return (i);
+	return (i + (s[i] == '\n'));
 }
 
 char	*ft_strjoin(char *s1, char *s2)
@@ -35,41 +32,39 @@ char	*ft_strjoin(char *s1, char *s2)
 	size_t	j;
 	char	*str;
 
-	str = (char *)malloc(sizeof(char) * (ft_strlen(s1) + ft_strlen(s2) + 1));
-	j = 0;
-	i = 0;
+	str = (char *)malloc(ft_strlen(s1) + ft_strlen(s2) + 1);
 	if (!str)
 		return (NULL);
-	while (s1[i] != '\0')
-	{
-	str[j] = s1[i];
-			i++;
-			j++;
-	}
 	i = 0;
-	while (s2[i] != '\0')
-	{
-		str[j] = s2[i];
-			i++;
-			j++;
-	}
-	str[j] = '\0';
+	j = 0;
+	while (s1 && s1[j])
+		str[i++] = s1[j++];
+	j = 0;
+	while (s2 && s2[j] && s2[j] != '\n')
+		str[i++] = s2[j++];
+	if (s2[j] == '\n')
+		str[i++] = '\n';
+	str[i] = '\0';
+	free(s1);
 	return (str);
 }
 
-char	*ft_strchr(const char *s, int c)
+int	organizer(char *buf)
 {
 	int	i;
+	int	j;
+	int	isnwl;
 
 	i = 0;
-
-	while (s)
+	j = 0;
+	isnwl = 0;
+	while (buf[i])
 	{
-		if (s[i] == (char)c)
-			return ((char *)&s[i + 1]);
-		if ((char)c == s[i])
-			return ((char *)&s[i]);
-		i++;
+		if (isnwl)
+			buf[j++] = buf[i];
+		if (buf[i] == '\n')
+			isnwl = 1;
+		buf[i++] = '\0';
 	}
-	return (NULL);
+	return (isnwl);
 }

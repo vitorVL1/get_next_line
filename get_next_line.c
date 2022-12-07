@@ -6,7 +6,7 @@
 /*   By: vlima <vlima@student.42lisboa.com>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/25 12:19:41 by vlima             #+#    #+#             */
-/*   Updated: 2022/12/05 15:55:23 by vlima            ###   ########.fr       */
+/*   Updated: 2022/12/07 14:54:45 by vlima            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,39 +14,27 @@
 
 char	*get_next_line(int fd)
 {
-	static char	bf[BUFFER_SIZE];
+	static char	bf[BUFFER_SIZE + 1];
 	char		*str;
-	int			i;
-	int			j;
 
 	str = NULL;
-	if (!bf || BUFFER_SIZE < 1)
+	if (fd < 0 || fd > FOPEN_MAX)
 		return (NULL);
-
-	str = ft_strjoin(0, bf);
-	i = 0;
-	while (str[i] && str[i] != '\n')
-		i++;
-	if (str[i] == '\n')
-		i++;
-	j = 0;
-	while (i < BUFFER_SIZE)
+	if (!bf[0])
+		bf[read(fd, bf, BUFFER_SIZE)] = 0;
+	while (bf[0])
 	{
-		str[j] = str[i];
-		i++;
-		j++;
+		str = ft_strjoin(str, bf);
+		if (!str)
+			return (NULL);
+		if (organizer(bf) == 1)
+			break ;
+		if (read(fd, bf, 0) < 0)
+		{
+			free(str);
+			return (NULL);
+		}
+		bf[read (fd, bf, BUFFER_SIZE)] = 0;
 	}
-	str[j++] = 0;
-	bf [read (fd, str, BUFFER_SIZE)] = 0;
 	return (str);
-
 }
-/* 
-int main()
-{
-	char	*line;
-	int fd;
-	fd = open("tst.txt",O_RDONLY);
-	printf("%s",get_next_line(fd));
-	line = get_next_line(fd);
-} */
